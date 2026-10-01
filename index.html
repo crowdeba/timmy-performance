@@ -410,7 +410,7 @@ var CONFIG = {
         {type:"sets", name:"Lat Pulldown", sets:["8","8","8"], rest:"90 sec", cue:"Full range, controlled tempo."},
         {type:"sets", name:"Chest-Supported Row", sets:["8","8","8"], rest:"75 sec", cue:"Squeeze your shoulder blades together."},
         {type:"sets", name:"Hamstring Curl", sets:["8-10","8-10"], rest:"60 sec", cue:"Controlled, full range."},
-        {type:"sets", name:"Calf Raises", sets:["10","10"], rest:"60 sec", cue:"Full range, controlled."}
+        {type:"sets", name:"Calf Raises", alternateWeek:true, sets:["10","10"], rest:"60 sec", cue:"Full range, controlled. This shows up every other week on purpose — keeps the benefit without aggravating cramping."}
       ]},
       wed: {label:"Upper + Core", note:"Face Pulls are new here on purpose — real scapular control work, given your shoulder history. Curl and tricep pushdown are paired to keep this inside your time window.", exercises:[
         {type:"sets", name:"DB Bench Press", sets:["6-8","6-8","6-8"], rest:"90 sec", cue:"Control tempo, no bounce."},
@@ -436,7 +436,7 @@ var CONFIG = {
         {type:"sets", name:"Lat Pulldown", sets:["6-8","6-8","6-8"], rest:"90 sec", cue:"Strong pull, controlled return."},
         {type:"sets", name:"Chest-Supported Row", sets:["6-8","6-8","6-8"], rest:"90 sec", cue:"Heavier, controlled — strong upper-back squeeze."},
         {type:"sets", name:"Hamstring Curl", sets:["8","8"], rest:"60 sec", cue:"Controlled, full range."},
-        {type:"sets", name:"Calf Raises", sets:["8-10","8-10"], rest:"60 sec", cue:"Full range, add weight gradually."}
+        {type:"sets", name:"Calf Raises", alternateWeek:true, sets:["8-10","8-10"], rest:"60 sec", cue:"Full range, add weight gradually. Every other week, same as Phase 1."}
       ]},
       wed: {label:"Upper + Core", note:"Same principle as Phase 1, heavier — Face Pulls stay in every phase, non-negotiable, given your shoulder history.", exercises:[
         {type:"sets", name:"DB Bench Press", sets:["5-6","5-6","5-6"], rest:"90 sec", cue:"Heavier than Phase 1, control the tempo."},
@@ -991,6 +991,14 @@ var CONFIG = {
     });
   }
 
+  function isOnWeek(){
+    var today = todayMid();
+    var seasonStart = parseDate(CONFIG.seasonStart);
+    var daysSince = Math.floor((today - seasonStart) / (1000*60*60*24));
+    var weekNum = Math.floor(daysSince / 7);
+    return (weekNum % 2) === 0;
+  }
+
   function renderWorkout(){
     var day = CONFIG.program[state.workoutPhase] && CONFIG.program[state.workoutPhase][state.workoutDay];
     if (!day){ document.getElementById('workout-content').innerHTML = '<div class="card"><p class="small">No workout found.</p></div>'; return; }
@@ -1029,6 +1037,7 @@ var CONFIG = {
       html += '<div class="card accent-red"><h3>Modified Workout</h3><p class="small" style="margin-top:6px;">'+todayOverride.label+'. The normal Phase '+state.workoutPhase+' workout is on hold this week &mdash; check with your coach for what to do today.</p></div>';
     } else {
       day.exercises.forEach(function(ex, idx){
+        if (ex.alternateWeek && !isOnWeek()) return;
         if (ex.type==='sets') html += renderSetsExercise(ex, idx);
         else if (ex.type==='superset') html += renderSupersetExercise(ex);
         else if (ex.type==='contrast') html += renderContrastExercise(ex);
